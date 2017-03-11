@@ -1,31 +1,48 @@
-{:uccx
- {:port #or [#env PORT 1504]
-  :hrhostname "atea_dev_uccx11"
-  :hrserver    #profile  {:default [#join ^:ref [:hostname] "_uccx"]
-                        :dev     [#join ^:ref [:hostname] "_uccx"]}
-  :hrdb      "db_cra"
-  :hostip    #profile  {:dev "9.1.1.62"}
-  :hrpassword "ateasystems0916"
-  :hruser     "uccxhruser"
-  :uri       #join ["jdbc:informix-sqli://"
-                    ^:ref [:hostip]
-                    ":"
-                    ^:ref [:port]]
-                    "/"
-                    ^:ref [:hrdb]]
-                    ":informixserver="
-                    ^:ref [:hrserver]]
-                    "_uccx;user="
-                    ^:ref [:hruser]]
-                    ";password="
-                    ^:ref [:hrpassword]]
-  }
+;; Copyright © 2017, Red Elvis.
+
+;; Aero configuration for DB access
+
+{
+ :port #or [#env UCCX_PORT 1504]
+ :uccx_srv #or [#env UCCX_SRV "devuccx10"]
+  :uccx_ip #or [#env UCCX_IP "9.1.1.103"]
+  :uccx_sec_srv #or [#env UCCX_SEC_SRV "9.1.1.64"]
+  :uccx_sec_ip #or [#env UCCX_SEC_IP "9.1.1.64"]
+  :uccx_db  #or [#env UCCX_DB "db_cra"]
+  :hrpasswd #or [#env HR_PASS "Cisco12345"]
+  :wallpasswd #or [#env WALL_PASS "Cisco12345"]
+  :hruser    "uccxhruser"
+  :walluser  "uccxwallboard"
+
+:uccx
+ {
+  :hruri    #join [ "jdbc:informix-sqli://"
+                   ^:ref [:uccx_ip]
+                   ":"
+                   ^:ref [:port]
+                   "/"
+                   ^:ref [:uccx_db]
+                   ":informixserver="
+                   ^:ref [:uccx_srv]
+                   "_uccx;user="
+                   ^:ref [:hruser]
+                   ";password="
+                   ^:ref [:hrpasswd]
+                   ]
+  :walluri  #join [ "jdbc:informix-sqli://"
+                   ^:ref [:uccx_ip]
+                   ":"
+                   ^:ref [:port]
+                   "/"
+                   ^:ref [:uccx_db]
+                   ":informixserver="
+                   ^:ref [:uccx_srv]
+                   "_uccx;user="
+                   ^:ref [:walluser]
+                   ";password="
+                   ^:ref [:wallpasswd]
+                   ]
 
 
- {:url #profile {:default #join ["jdbc:postgresql://psq-prod/prod?user="
-                                 #env PROD_USER
-                                 "&password="
-                                 #env PROD_PASSWD]
-                 }
   }
  }

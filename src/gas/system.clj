@@ -1,39 +1,45 @@
+;; Copyright © 2017, Red Elvis.
 (ns gas.system
-  (require '[com.stuartsierra.component :as component]))
+  (:require
+   [aero.core :as aero]
+   [clojure.java.io :as io]
+   [com.stuartsierra.component :refer [system-map system-using]]
+   [gas.db :as db]
+   )
+)
 
-(defn db-spec [subprotocol driver-classname subname user password]
-  {:subprotocol    subprotocol
-   :classname      driver-classname
-   :subname        subname
-   :user           user
-   :password       password
-   :make-pool?     true
-   :naming         {:keys   clojure.string/lower-case
-                    :fields clojure.string/upper-case}})
 
-(defrecord Database [subprotocol driver-classname subname user password]
-  component/Lifecycle
+(defn config
+  "Read EDN config, with the given profile. See Aero docs at
+  https://github.com/juxt/aero for details."
+  [profile]
+  (aero/read-config (io/resource "config.edn") {:profile profile}))
 
-  (start [component]
-    (if-let [dbspec (:connection component)]
-      (do
-        (println ";; db connection already established")
-        component)
-      (let [dbspec (db-spec subprotocol
-                            driver-classname
-                            subname
-                            user
-                            password)]
-        (println (str ";; connected to " user "@" subprotocol ":"
-                      subname " ..."))
-        ;;(ddl/recreate-tables-safe! dbspec)
-        (assoc component :connection dbspec))))
+(defn configure-components
+  "Merge configuration to its corresponding component (prior to the
+  system starting). This is a pattern described in
+  https://juxt.pro/blog/posts/aero.html"
+  [system config]
+  (merge-with merge system config))
 
-  (stop [component]
-    (if-let [dbspec (:connection component)]
-      (println ";; tearing down database connection")
-      (println ";; no db connection exists"))
-    (assoc component :connection nil)))
+(defn new-system-map
+  "Create the system. See https://github.com/stuartsierra/component"
+  [config]
+  (system-map
+   :hr-db   (db/new-hrdb    (:uccx config))
+   :wall-db (db/new-walldb  (:uccx config))
+   ))
 
-(defn new-db [m]
-  (map->Database m))
+(defn new-dependency-map
+  "Declare the dependency relationships between components. See
+  https://github.com/stuartsierra/component"
+  []
+  {})
+
+(defn new-system
+  "Construct a new system, configured with the given profile"
+  [profile]
+  (let [config (config profile)]
+    (-> (new-system-map config)
+        (configure-components config)
+        (system-using (new-dependency-map)))))

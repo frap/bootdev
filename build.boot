@@ -27,28 +27,44 @@
       :otherwise version)))
 
 (def project "gas")
-(def version (deduce-version-from-git))
+(def version "0.0.1" ;;(deduce-version-from-git)
+  )
 
 (set-env!
- :source-paths #{"src"}
- :resource-paths #{"resources"
-                   "src" ;; add sources to uberjar
+ :source-paths    #{"src"}
+ :resource-paths  #{"resources"
+                    "src" ;; add sources to uberjar
                    }
  :dependencies
- '[[reloaded.repl "0.2.3" :scope "test"]
+        '[[reloaded.repl "0.2.3" :scope "test"]
 
-   [org.clojure/clojure "1.9.0-alpha14"]
-   [org.clojure/tools.nrepl "0.2.12"]
+          [org.clojure/clojure "1.9.0-alpha14"]
+          [org.clojure/tools.nrepl "0.2.12"]
 
-   ;; Server deps
-   [aero "1.0.3"]
-   [com.stuartsierra/component "0.3.2"]
-   [org.clojure/tools.namespace "0.2.11"]
-   ])
+          ;; Server deps
+          [aero "1.1.2"]
+          [aleph "0.4.2-alpha12"]
+          [com.stuartsierra/component "0.3.2"]
+          [org.clojure/tools.namespace "0.2.11"]
+          ;; DB dependencies
+          [com.layerware/hugsql "0.4.7"]
+          [org.clojure/java.jdbc "0.7.0-alpha1"]
+          [duct/hikaricp-component "0.1.2"]
+          [com.informix/ifxjdbc "4.10.JC8DE"]
+          [local/ojdbc6 "11.2.0.4"]
+          [datascript "0.15.5"]
+          ;;logging
+          [org.clojure/tools.logging "0.3.1"]
+          [adzerk/boot-logservice "1.2.0"]
+          [clj-time "0.13.0"]
+          ;; Exceptions
+          [dire "0.5.4"]
+          ])
 
 (require '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
-         '[gas.system :refer [new-system]])
+         '[gas.system :refer [new-system]]
+         )
 
 (def repl-port 5600)
 
@@ -58,6 +74,8 @@
       :description "A gas playground db access"
       :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}}
 )
+
+
 
 (deftask dev-system
   "Develop the server backend. The system is automatically started in
@@ -84,6 +102,7 @@
 
   (comp
    (watch)
+   (cider)
    (repl :server true
          :port repl-port
          :init-ns 'user)
@@ -113,7 +132,7 @@
 (deftask uberjar
   "Build an uberjar"
   []
-  (println "Building uberjar")
+  (println "Building Gas uberjar")
   (comp
    (aot)
    (pom)
