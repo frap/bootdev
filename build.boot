@@ -43,7 +43,7 @@
 
           ;; Server deps
           [aero "1.1.2"]
-          [aleph "0.4.2-alpha12"]
+          [aleph "0.4.3"]
           [com.stuartsierra/component "0.3.2"]
           [org.clojure/tools.namespace "0.2.11"]
           ;; DB dependencies
