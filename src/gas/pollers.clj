@@ -10,6 +10,8 @@
                )
   )
 
+(defonce uccx-stats (atom {}))
+
 (def schema {:skill {:db/cardinality :db.cardinality/many}})
 
 
@@ -61,20 +63,31 @@
 
 ;;(j/query hrspec  ["{call sp_abandoned_calls_activity(?,?,'0',null) }"] :as-arrays? true)
 
-(def rts (atom {}))
-(def gos (atom {}))
 
-(defn rts-period [ db ]
-  (s/periodically 10000 #(swap! rts (getrts db))))
+(defn rts-period
+   "Polls for real time Stats RTICDStatistics from remote UCCX database
+   every poll-interval (secs) and merges with local atom"
+  [ db  poll-interval ]
+  (strm-consume
+   #(swap! uccx-stats merge {:rts %})
+   (s/periodically (* 1000 poll-interval) #(getrts db)))
+  )
 
-(defn gos-period [ db ]
-  (s/periodically 10000 #(swap! gos (getgos db))))
+(defn gos-period
+  "Polls for Grade of Service Statistics from remote UCCX database
+   every poll-interval (secs) and merges with local atom"
+  [ db  poll-interval ]
+  (strm-consume
+   #(swap! uccx-stats merge {:gos %})
+   (s/periodically (* 1000 poll-interval) #(getgos db)))
+  )
 
 ;;(s/consume println rts-period)
 ;;(strm-consume pprint (rts-period ))
 ;;(s/description rts-period)
 
 ;;(s/close! rts-period)
+
 
 
 ;; @(t/in 1000 getrts)

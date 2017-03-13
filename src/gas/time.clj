@@ -10,10 +10,10 @@
 ;;(def date-format (ctime-f/formatters :date))
 ;;(def prettydate-format (ctime-f/formatter "EEE d, yyyy 'at' HH.mm. "))
 
-(def today (atom nil))
+;;(def today (atom nil))
 
 ;;(defn update-today []
-  (reset! today (ctime-f/unparse date-format (ctime-u/now))))
+;;  (reset! today (ctime-f/unparse date-format (ctime-u/now))))
 
 ;;(defn print-today []
-  (ctime-f/unparse (ctime-f/with-zone prettydate-format (ctime-u/default-time-zone)) (ctime-u/now)))
+;;  (ctime-f/unparse (ctime-f/with-zone prettydate-format (ctime-u/default-time-zone)) (ctime-u/now)))
