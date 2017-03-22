@@ -1,2 +1,2 @@
 # boot-uccx
-Playaround with Uccx wallbaord access
+Playaround with UCCX stats access for wallboard
