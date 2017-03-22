@@ -44,12 +44,19 @@
           ;; Server deps
           [aero "1.1.2"]
           [aleph "0.4.3"]
+          [bidi "2.0.16"]
           [com.stuartsierra/component "0.3.2"]
           [org.clojure/tools.namespace "0.2.11"]
+          [prismatic/schema "1.1.3"]
+          [selmer "1.10.6"]
+          [yada "1.2.1" :exclusions [aleph manifold ring-swagger prismatic/schema]]
+          ;; App deps
+          [reagent "0.6.0"]
+          [metosin/ring-swagger "0.22.10"]
           ;; DB dependencies
           [com.layerware/hugsql "0.4.7"]
           [org.clojure/java.jdbc "0.7.0-alpha1"]
-          [duct/hikaricp-component "0.1.2"]
+          [duct/hikaricp-component "0.1.0"]
           [com.informix/ifxjdbc "4.10.JC8DE"]
           [local/ojdbc6 "11.2.0.4"]
           [datascript "0.15.5"]
@@ -71,7 +78,7 @@
 (task-options!
  pom {:project (symbol project)
       :version version
-      :description "A gas playground db access"
+      :description "A UCCX stats playground access"
       :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}}
 )
 

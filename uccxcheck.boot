@@ -13,17 +13,15 @@
 
    ;; Server deps
    ;;[aero "1.0.3"]
-   [aleph "0.4.2-alpha12"]
-   [byte-streams "0.2.2"]
+   [aleph "0.4.3"]
    [com.stuartsierra/component "0.3.2"]
    [org.clojure/tools.namespace "0.2.11"]
    ;; DB dependencies
    ;;[com.layerware/hugsql "0.4.7"]
    [org.clojure/java.jdbc "0.7.0-alpha1"]
-   [duct/hikaricp-component "0.1.2"]
+   [duct/hikaricp-component "0.1.0"]
    [com.informix/ifxjdbc "4.10.JC8DE"]
    ;;[local/ojdbc6 "11.2.0.4"]
-   [manifold "0.1.6-alpha4"]
    ;;logging
    [org.clojure/tools.logging "0.3.1"]
    ;;[adzerk/boot-logservice "1.2.0"]
@@ -45,7 +43,7 @@
 
 (defclifn -main
 "  Checks UCCX wallboarduser connection is setup correctly for
-   Atea's wallboard and Cisco UCCX authentication tokens.
+   Ateas wallboard and Cisco UCCX authentication tokens.
 
    UCCX variables (UCCX_SRV, UCCX_IP) can be set using command-line
    options below.
@@ -68,7 +66,7 @@
           (do  (println "\nERROR: you must provide UCCX server/IP and wallboard password credentials. Try uccx-check -h")
                (println "\nCurrent provided named parameters: " *opts*)
                )
-          (do  (println  "\n** Getting stats from server = " server " @ IP= **")
+          (do  (println  "\n** Getting stats from server = " server " @ IP=" hostip)
                (new-uccx-system server hostip passwd)
 
                )

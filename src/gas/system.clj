@@ -4,7 +4,9 @@
    [aero.core :as aero]
    [clojure.java.io :as io]
    [com.stuartsierra.component :refer [system-map system-using]]
-   [gas.db :as db]
+   [gas.selmer :refer [new-selmer]]
+   [gas.web-server :refer [new-web-server]]
+   [gas.db :refer  [new-hrdb new-walldb new-localdb]]
    )
 )
 
@@ -26,8 +28,11 @@
   "Create the system. See https://github.com/stuartsierra/component"
   [config]
   (system-map
-   :hr-db   (db/new-hrdb    (:uccx config))
-   :wall-db (db/new-walldb  (:uccx config))
+   :web-server (new-web-server)
+   :selmer (new-selmer)
+   :hr-db   (new-hrdb    (:uccx config))
+   :wall-db (new-walldb  (:uccx config))
+   :localdb (new-localdb)
    ))
 
 (defn new-dependency-map

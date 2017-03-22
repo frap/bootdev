@@ -4,13 +4,14 @@
                [manifold.time :as t]
                [aleph.http :as http]
                [byte-streams :as bs]
+               [gas.system :as uccx-stats :refer [system]]
                [gas.time :refer [yesterday]]
                [gas.sql  :as sql]
                [datascript.core :as ds]
                )
   )
 
-(defonce uccx-stats (atom {}))
+;;(defonce uccx-stats (atom {}))
 
 (def schema {:skill {:db/cardinality :db.cardinality/many}})
 

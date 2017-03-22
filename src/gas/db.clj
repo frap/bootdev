@@ -64,3 +64,24 @@
 
 (defn new-db [m]
   (map->Database m))
+
+(defrecord LocalDB
+  Lifecycle
+
+  (start [component]
+    (if-let [localatom (:localdb component)]
+      (do
+        (println ";; Local Atom DB already defined")
+        component)
+      (let [uccx-stats (atom {})]
+        (println (str ";; establishing local UCCX Stats Atom DB"))
+        (assoc component :localdb uccx-stats))))
+
+  (stop [component]
+    (if-let [dbspec (:connection component)]
+      (println ";; removing local UCCX Stats database")
+      (println ";; no db connection exists"))
+    (assoc component :localdb nil)))
+
+(defn new-localdb [m]
+  (map->LocalDB m))
