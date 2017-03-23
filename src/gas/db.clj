@@ -19,6 +19,14 @@
                   :password (:wallpasswd config)})
   )
 
+(defn search-entries [db q]
+  (println db q))
+
+(defn get-entries [db]
+  println db)
+
+(defn add-entry [db]
+  println db)
 
 
 (def wallb-dbspec { :classname "com.informix.jdbc.IfxDriver"
@@ -65,23 +73,23 @@
 (defn new-db [m]
   (map->Database m))
 
-(defrecord LocalDB
+(defrecord LocalDB []
   Lifecycle
 
   (start [component]
-    (if-let [localatom (:localdb component)]
+    (if-let [localatom (:uccx-stats component)]
       (do
         (println ";; Local Atom DB already defined")
         component)
       (let [uccx-stats (atom {})]
         (println (str ";; establishing local UCCX Stats Atom DB"))
-        (assoc component :localdb uccx-stats))))
+        (assoc component :uccx-stats uccx-stats))))
 
   (stop [component]
-    (if-let [dbspec (:connection component)]
+    (if-let [uccx-stats (:uccx-stats component)]
       (println ";; removing local UCCX Stats database")
       (println ";; no db connection exists"))
-    (assoc component :localdb nil)))
+    (assoc component :uccx-stats nil)))
 
 (defn new-localdb [m]
   (map->LocalDB m))

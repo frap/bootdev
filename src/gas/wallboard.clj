@@ -11,7 +11,8 @@
    [manifold.deferred :as d]
    [manifold.stream :as stream]
    [aleph.http :as http]
-   [byte-streams :as bs]))
+   [byte-streams :as bs]
+   [gas.db :as db]))
 
 (defn slug->title [slug]
   (str/replace slug "_" " "))
@@ -105,7 +106,7 @@
                  ;; Phonebook index
                  ["" (new-index-resource db)]
                  ;; Phonebook entry, with path parameter
-                 [["/" :id] (new-entry-resource db)]]]]
+                 [["/" :id] (new-index-resource db)]]]]
     [""
      [
       routes

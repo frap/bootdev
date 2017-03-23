@@ -1,6 +1,6 @@
 ;; Copyright © 2016, JUXT LTD.
 
-(ns edge.web-server
+(ns gas.web-server
   (:require
    [bidi.bidi :refer [tag]]
    [bidi.vhosts :refer [make-handler vhosts-model]]
@@ -21,7 +21,7 @@
   [""
    [["/" (yada/redirect ::wallboard/wallboard-index)]
 
-    (wiki/wiki-routes)
+    (wallboard/wallboard-routes)
 
     ["/wallboard.css"
      (-> (yada/as-resource (io/resource "public/wallboard.css"))

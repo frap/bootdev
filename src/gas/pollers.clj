@@ -4,7 +4,6 @@
                [manifold.time :as t]
                [aleph.http :as http]
                [byte-streams :as bs]
-               [gas.system :as uccx-stats :refer [system]]
                [gas.time :refer [yesterday]]
                [gas.sql  :as sql]
                [datascript.core :as ds]
@@ -45,14 +44,14 @@
         ))
   )
 
-(defn getrts [ db ]
-  (into {} (sql/realtimestats db)))
+(defn getrts [ uccxdb ]
+  (into {} (sql/realtimestats uccxdb)))
 
-(defn getgos    [ db ]
-  (into {} (sql/gos db {:starttime yesterday})))
+(defn getgos    [ uccxdb ]
+  (into {} (sql/gos uccxdb {:starttime yesterday})))
 
-(defn poll   [ db func ]
-   (into {}  ( func db)))
+(defn poll   [ uccxdb func ]
+   (into {}  ( func uccxdb)))
 
 ;;(pprint (sql/callsdirectin hrspec {:viewtime yesterday}))
 
@@ -68,19 +67,19 @@
 (defn rts-period
    "Polls for real time Stats RTICDStatistics from remote UCCX database
    every poll-interval (secs) and merges with local atom"
-  [ db  poll-interval ]
+  [ uccxdb stats-db poll-interval ]
   (strm-consume
-   #(swap! uccx-stats merge {:rts %})
-   (s/periodically (* 1000 poll-interval) #(getrts db)))
+   #(swap! stats-db merge {:rts %})
+   (s/periodically (* 1000 poll-interval) #(getrts uccxdb)))
   )
 
 (defn gos-period
   "Polls for Grade of Service Statistics from remote UCCX database
    every poll-interval (secs) and merges with local atom"
-  [ db  poll-interval ]
+  [ uccxdb stats-db poll-interval ]
   (strm-consume
-   #(swap! uccx-stats merge {:gos %})
-   (s/periodically (* 1000 poll-interval) #(getgos db)))
+   #(swap! stats-db merge {:gos %})
+   (s/periodically (* 1000 poll-interval) #(getgos uccxdb)))
   )
 
 ;;(s/consume println rts-period)

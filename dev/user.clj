@@ -54,7 +54,7 @@
 
 ;;(pprint (poll/check-master urlbad))
 
-(defn get-latest-stats [] (-> pprint poll/uccx-stats))
+(defn get-latest-stats [] (-> pprint (:uccx-stats system)))
 ;;(pprint (poll/getgos hrspec))
 
 ;;(poll/strm-consume pprint (poll/gos-period hrspec))

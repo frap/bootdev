@@ -32,7 +32,7 @@
    :selmer (new-selmer)
    :hr-db   (new-hrdb    (:uccx config))
    :wall-db (new-walldb  (:uccx config))
-   :localdb (new-localdb)
+   :uccx-stats (new-localdb)
    ))
 
 (defn new-dependency-map
