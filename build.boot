@@ -12,7 +12,8 @@
   (when version
     (let [[a b] (next (re-matches #"(.*?)([\d]+)" version))]
       (when (and a b)
-        (str a (inc (Long/parseLong b)))))))
+        (str a (inc (Long/parseLong b))))))
+  )
 
 (defn deduce-version-from-git
   "Avoid another decade of pointless, unnecessary and error-prone
@@ -26,47 +27,65 @@
       (pos? (Long/parseLong commits)) (str (next-version version) "-" hash)
       :otherwise version)))
 
-(def project "gas")
-(def version "0.0.1" ;;(deduce-version-from-git)
-  )
+(def project "gas-sample")
+(def version (deduce-version-from-git))
 
 (set-env!
  :source-paths    #{"src"}
  :resource-paths  #{"resources"
                     "src" ;; add sources to uberjar
-                   }
+                    }
+ :repositories #(conj % '["ibm" {:url "https://mvnrepository.com/artifact/com.ibm.informix/jdbc"}])
  :dependencies
-        '[[reloaded.repl "0.2.3" :scope "test"]
+ '[
+   [boot-deps "1.6" :scope "test"] ;;  ancient for boot 
+   [adzerk/boot-cljs "1.7.228-1" :scope "test"]
+   [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
+   [adzerk/boot-reload "0.5.1" :scope "test"]
+   [adzerk/bootlaces "0.1.13" scope "test"]
+   [weasel "0.7.0" :scope "test"] ;; Websocket Server
+   ;;[deraen/boot-sass "0.3.0" :scope "test"]
+   [reloaded.repl "0.2.3" :scope "test"]
+   ;; Needed for start-repl in cljs repl
+   [com.cemerick/piggieback "0.2.1" :scope "test"]
+   [org.clojure/clojure "1.8.0"]
+   [org.clojure/core.incubator "0.1.4"]
+   [org.clojure/clojurescript "1.9.229"]
+   [org.clojure/tools.nrepl "0.2.12"]
 
-          [org.clojure/clojure "1.9.0-alpha14"]
-          [org.clojure/tools.nrepl "0.2.12"]
+   ;; Server deps
+   [aero "1.1.2"]
+   [bidi "2.0.16"]
+   [aleph "0.4.3"]
+   [com.stuartsierra/component "0.3.2"]
+   [org.clojure/tools.namespace "0.2.11"]
+   ;;[hiccup "1.0.5"]
+   ;;[prismatic/schema "1.1.3"]
+   ;;[selmer "1.10.6"]
+   ;;[yada "1.2.1" :exclusions [aleph manifold ring-swagger prismatic/schema]]
+   ;;[metosin/ring-swagger "0.22.10"]
+   [clj-time "0.13.0"]
 
-          ;; Server deps
-          [aero "1.1.2"]
-          [aleph "0.4.3"]
-          [bidi "2.0.16"]
-          [com.stuartsierra/component "0.3.2"]
-          [org.clojure/tools.namespace "0.2.11"]
-          [prismatic/schema "1.1.3"]
-          [selmer "1.10.6"]
-          [yada "1.2.1" :exclusions [aleph manifold ring-swagger prismatic/schema]]
-          ;; App deps
-          [reagent "0.6.0"]
-          [metosin/ring-swagger "0.22.10"]
-          ;; DB dependencies
-          [com.layerware/hugsql "0.4.7"]
-          [org.clojure/java.jdbc "0.7.0-alpha1"]
-          [duct/hikaricp-component "0.1.0"]
-          [com.informix/ifxjdbc "4.10.JC8DE"]
-          [local/ojdbc6 "11.2.0.4"]
-          [datascript "0.15.5"]
-          ;;logging
-          [org.clojure/tools.logging "0.3.1"]
-          [adzerk/boot-logservice "1.2.0"]
-          [clj-time "0.13.0"]
-          ;; Exceptions
-          [dire "0.5.4"]
-          ])
+   ;; DB dependencies
+   ;;[com.layerware/hugsql "0.4.7"]
+   [org.clojure/java.jdbc "0.7.0-alpha1"]
+   [atea/hikaricp-component "0.1.6"]
+   [com.ibm.informix/jdbc "4.10.8.1"]
+   ;;[local/ojdbc6 "11.2.0.4"]
+   ;;[datascript "0.15.5"]
+
+   ;;logging
+   [org.clojure/tools.logging "0.3.1"]
+   [adzerk/boot-logservice "1.2.0"]
+
+   ;; App deps
+   ;;[reagent "0.6.0"]
+
+   ;; Exceptions
+   [dire "0.5.4"]
+   [slingshot "0.12.2"]
+   ]
+ )
 
 (require '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
@@ -78,7 +97,7 @@
 (task-options!
  pom {:project (symbol project)
       :version version
-      :description "A UCCX stats playground access"
+      :description "A sample boot project setup"
       :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}}
 )
 
