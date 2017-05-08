@@ -1,13 +1,11 @@
 #!/usr/bin/env boot
 
 (set-env!
- :source-paths    #{"src"}
- :resource-paths  #{"resources"}
  :dependencies
  '[
    [reloaded.repl "0.2.3" :scope "test"]
 
-   [org.clojure/clojure "1.9.0-alpha14"]
+   [org.clojure/clojure "1.8.0"]
    [org.clojure/tools.nrepl "0.2.12" :scope "test"]
    [adzerk/bootlaces "0.1.13" scope "test"]
 
@@ -27,6 +25,7 @@
    ;;[adzerk/boot-logservice "1.2.0"]
    ;; Exceptions
    [dire "0.5.4"]
+   [atea/uccxcheck "0.1.7"]
    ])
 
 ;;; Components
@@ -34,7 +33,7 @@
 (require '[adzerk.bootlaces   :refer :all]
          '[clojure.java.io    :as io]
          '[boot.cli           :refer [defclifn]]
-         '[gas.uccx           :refer [new-uccx-system]]
+         '[atea.uccx           :refer [new-uccx-system]]
          )
 
 ;;(def +version+ "0.1.2")
@@ -63,7 +62,7 @@
             ]
 
         (if (or (nil? server) (nil? hostip) (nil? passwd))
-          (do  (println "\nERROR: you must provide UCCX server/IP and wallboard password credentials. Try uccx-check -h")
+          (do  (println "\nERROR: you must provide UCCX server/IP and wallboard password credentials. Try uccx-check -h" *usage*)
                (println "\nCurrent provided named parameters: " *opts*)
                )
           (do  (println  "\n** Getting stats from server = " server " @ IP=" hostip)

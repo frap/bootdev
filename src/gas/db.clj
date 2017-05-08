@@ -91,5 +91,5 @@
       (println ";; no db connection exists"))
     (assoc component :uccx-stats nil)))
 
-(defn new-localdb [m]
-  (map->LocalDB m))
+(defn new-localdb []
+  (map->LocalDB {} ))

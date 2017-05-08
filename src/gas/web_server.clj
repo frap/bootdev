@@ -55,4 +55,4 @@
 (defn new-web-server []
   (using
    (map->WebServer {})
-   [:fs2 :datomic :migrator]))
+   [:uccx-stats :hr-db :wall-db ]))
