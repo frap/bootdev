@@ -38,58 +38,79 @@
  :repositories #(conj % '["ibm" {:url "https://mvnrepository.com/artifact/com.ibm.informix/jdbc"}])
  :dependencies
  '[
-   [boot-deps "1.6" :scope "test"] ;;  ancient for boot 
-   [adzerk/boot-cljs "1.7.228-1" :scope "test"]
-   [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
-   [adzerk/boot-reload "0.5.1" :scope "test"]
-   [adzerk/bootlaces "0.1.13" scope "test"]
-   [weasel "0.7.0" :scope "test"] ;; Websocket Server
-   ;;[deraen/boot-sass "0.3.0" :scope "test"]
-   [reloaded.repl "0.2.3" :scope "test"]
-   ;; Needed for start-repl in cljs repl
-   [com.cemerick/piggieback "0.2.1" :scope "test"]
-   [org.clojure/clojure "1.8.0"]
-   [org.clojure/core.incubator "0.1.4"]
-   [org.clojure/clojurescript "1.9.229"]
-   [org.clojure/tools.nrepl "0.2.12"]
+                 [org.clojars.magomimmo/domina "2.0.0-SNAPSHOT"]
+                 [hiccups "0.3.0"]
+                 [compojure "1.5.2"]                   ;; for routing
+                 [org.clojars.magomimmo/shoreleave-remote-ring "0.3.3"]
+                 [org.clojars.magomimmo/shoreleave-remote "0.3.1"]
+                 [javax.servlet/javax.servlet-api "3.1.0"]
+                 [org.clojars.magomimmo/valip "0.4.0-SNAPSHOT"]
+                 [enlive "1.1.6"]
+   ][
+     [org.clojure/clojure "1.8.0"]         ;; add CLJ
+     ;;[org.clojure/core.incubator "0.1.4"]
+     [org.clojure/clojurescript "1.9.473"] ;; add CLJS
 
-   ;; Server deps
-   [aero "1.1.2"]
-   [bidi "2.0.16"]
-   [aleph "0.4.3"]
-   [com.stuartsierra/component "0.3.2"]
-   [org.clojure/tools.namespace "0.2.11"]
-   ;;[hiccup "1.0.5"]
-   ;;[prismatic/schema "1.1.3"]
-   ;;[selmer "1.10.6"]
-   ;;[yada "1.2.1" :exclusions [aleph manifold ring-swagger prismatic/schema]]
-   ;;[metosin/ring-swagger "0.22.10"]
-   [clj-time "0.13.0"]
+     [adzerk/boot-cljs "1.7.228-2"      :scope "test"]
+     [pandeiro/boot-http "0.7.6"        :scope "test"]
+     [adzerk/boot-reload "0.5.1"        :scope "test"]
+     [adzerk/boot-cljs-repl "0.3.3"     :scope "test"]    ;; add bREPL
+     [com.cemerick/piggieback "0.2.1"   :scope "test"]    ;; needed by bREPL
+     [weasel "0.7.0"                    :scope "test"]    ;; websocket srv
+     [org.clojure/tools.nrepl "0.2.12"  :scope "test"]    ;; needed by bREPL
+     [reloaded.repl "0.2.3"             :scope "test"]
+     [boot-deps "0.1.6"                 :scope "test"]    ;;  ancient for boot 
+   
+     ;;[deraen/boot-sass "0.3.0" :scope "test"]
+     ;;TESTing
+     [adzerk/boot-test "1.2.0"          :scope "test"]
+     [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT" :scope "test"]
 
-   ;; DB dependencies
-   ;;[com.layerware/hugsql "0.4.7"]
-   [org.clojure/java.jdbc "0.7.0-alpha1"]
-   [atea/hikaricp-component "0.1.6"]
-   [com.ibm.informix/jdbc "4.10.8.1"]
-   ;;[local/ojdbc6 "11.2.0.4"]
-   ;;[datascript "0.15.5"]
+      
+     ;; Server deps
+     [aero "1.1.2"]
+     [bidi "2.0.16"]
+     [aleph "0.4.3"]
+     [com.stuartsierra/component "0.3.2"]
+     [org.clojure/tools.namespace "0.2.11"]
+     ;;[hiccup "1.0.5"]
+     
+     ;;[selmer "1.10.6"]
+    ;;[yada "1.2.1" :exclusions [aleph manifold ring-swagger prismatic/schema]]
+   
+     [clj-time "0.13.0"]
 
-   ;;logging
-   [org.clojure/tools.logging "0.3.1"]
-   [adzerk/boot-logservice "1.2.0"]
+     ;; DB dependencies
+     ;;[com.layerware/hugsql "0.4.7"]
+     ;;[org.clojure/java.jdbc "0.7.0-alpha1"]
+     [atea/hikaricp-component "0.1.6"]
+     [com.ibm.informix/jdbc "4.10.8.1"]
+     [org.clojars.pntblnk/clj-ldap "0.0.13"]  ;; LDAP
+   
+     ;;[datascript "0.15.5"]
 
-   ;; App deps
-   ;;[reagent "0.6.0"]
+     ;;logging
+     [org.clojure/tools.logging "0.3.1"]
+     [adzerk/boot-logservice "1.2.0"]
 
-   ;; Exceptions
-   [dire "0.5.4"]
-   [slingshot "0.12.2"]
-   ]
+     ;; App deps
+     ;;[reagent "0.6.0"]
+
+     ;; Exceptions
+     [dire "0.5.4"]
+     [slingshot "0.12.2"]
+     ]
  )
 
-(require '[com.stuartsierra.component :as component]
+(require '[adzerk.boot-cljs :refer [cljs]]
+         '[pandeiro.boot-http :refer [serve]]
+         '[adzerk.boot-reload :refer [reload]]
+         '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
+         '[adzerk.boot-test :refer [test]]
+         '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+         '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
-         '[gas.system :refer [new-system]]
+         '[atea.system :refer [new-system]]
          )
 
 (def repl-port 5600)
@@ -101,7 +122,17 @@
       :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}}
 )
 
+(def defaults {:test-dirs #{"test/cljc"}
+               :output-to "main.js"
+               :testbed :phantom
+               :namespaces '#{atea.validators-test
+                              atea.login.validators-test}})
 
+(deftask add-source-paths
+  "Add paths to :source-paths environment variable"
+  [t dirs PATH #{str} ":source-paths"]
+  (merge-env! :source-paths dirs)
+  identity)
 
 (deftask dev-system
   "Develop the server backend. The system is automatically started in
@@ -138,6 +169,39 @@
 (deftask build
   []
   (target :dir #{"static"}))
+
+
+(deftask tdd
+  "Launch a customisable TDD Environment"
+  [e testbed        ENGINE kw     "the JS testbed engine (default phantom)"
+   k httpkit               bool   "Use http-kit web server (default jetty)"
+   n namespaces     NS     #{sym} "the set of namespace symbols to run tests in"
+   o output-to      NAME   str    "the JS output file name for test (default main.js)"
+   O optimizations  LEVEL  kw     "the CLJS optimisation level (default none)"
+   p port           PORT   int    "the web server port to listen on (default 3000)"
+   t dirs           PATH   #{str} "test paths (default test/clj test/cljs test/cljc)"
+   v verbose               bool   "Print which files have changed (default false)"]
+  (let [dirs (or dirs (:test-dirs defaults))
+        output-to (or output-to (:output-to defaults))
+        testbed (or testbed (:testbed defaults))
+        namespaces (or namespaces (:namespaces defaults))]
+    (comp
+     (serve :handler 'atea.core/app
+            :resource-root "target"
+            :reload true
+            :httpkit httpkit
+            :port port)
+     (add-source-paths :dirs dirs)
+     (watch :verbose verbose)
+     (reload :ws-host "localhost")
+     (cljs-repl)
+     (test-cljs :out-file output-to
+                :js-env testbed
+                :namespaces namespaces
+                :update-fs? true
+                :optimizations optimizations)
+     (test :namespaces namespaces)
+     (target :dir #{"target"}))))
 
 (defn- run-system [profile]
   (println "Running system with profile" profile)

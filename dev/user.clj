@@ -11,9 +11,9 @@
    [com.stuartsierra.component :as component]
    [reloaded.repl :refer [system init start stop go reset reset-all]]
    ;; [clojure.core.async :as a :refer [>! <! >!! <!! chan buffer dropping-buffer sliding-buffer close! timeout alts! alts!! go-loop]]
-   [gas.system :as system]
-   [gas.sql :as sql]
-   [gas.pollers :as poll]
+   [atea.system :as system]
+   ;;[atea.sql :as sql]
+   
    [clojure.java.jdbc :as j]
    [manifold.stream :as s]
    [manifold.deferred :as d]
@@ -24,7 +24,7 @@
    ;;[yada.test :refer [response-for]]
    ;;logging
   ;; [adzerk/boot-logservice :as log-service]
-  ;; [clojure.tools.logging  :as log]
+   [clojure.tools.logging  :as log]
    ;; Exceptions
    [dire.core :refer [with-handler! with-finally!]]
 
@@ -41,27 +41,15 @@
       (system/new-dependency-map))
      config)))
 
-;;(Alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
+(alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
 
 (reloaded.repl/set-init! new-dev-system)
 
-;;(def wallspec  (:spec (:wall-db system)))
+(defn get-latest-stats [] (-> pprint (:db system)))
 
-;;(def hrspec    (:spec (:hr-db system)))
-
-(def urlgood "http://9.1.1.103/uccx/isDBMaster")
-(def urlbad  "http://9.1.1.120/uccx/isDBMaster")
-
-;;(pprint (poll/check-master urlbad))
-
-(defn get-latest-stats [] (-> pprint (:uccx-stats system)))
-;;(pprint (poll/getgos hrspec))
-
-;;(poll/strm-consume pprint (poll/gos-period hrspec))
-;;(s/close poll/gos-period)
 
 (defn test-all []
-  (run-all-tests #"gas.*test$"))
+  (run-all-tests #"atea.*test$"))
 
 (defn reset-and-test []
   (reset)

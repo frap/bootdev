@@ -1,5 +1,5 @@
 ;; Copyright © 2017, Red Elvis.
-(ns gas.db
+(ns atea.db
   (:require   [com.stuartsierra.component :refer [Lifecycle]]
               [duct.component.hikaricp :refer [hikaricp]]
               )
@@ -12,12 +12,7 @@
                 :password (:hrpasswd config)})
   )
 
-(defn new-walldb [config]
-  (hikaricp      {:pool-name "UccxWallbd"
-                  :uri (:walluri config)
-                  :username "uccxwallboard"
-                  :password (:wallpasswd config)})
-  )
+
 
 (defn search-entries [db q]
   (println db q))
@@ -73,23 +68,3 @@
 (defn new-db [m]
   (map->Database m))
 
-(defrecord LocalDB []
-  Lifecycle
-
-  (start [component]
-    (if-let [localatom (:uccx-stats component)]
-      (do
-        (println ";; Local Atom DB already defined")
-        component)
-      (let [uccx-stats (atom {})]
-        (println (str ";; establishing local UCCX Stats Atom DB"))
-        (assoc component :uccx-stats uccx-stats))))
-
-  (stop [component]
-    (if-let [uccx-stats (:uccx-stats component)]
-      (println ";; removing local UCCX Stats database")
-      (println ";; no db connection exists"))
-    (assoc component :uccx-stats nil)))
-
-(defn new-localdb []
-  (map->LocalDB {} ))

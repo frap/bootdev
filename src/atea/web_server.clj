@@ -1,15 +1,14 @@
 ;; Copyright © 2016, JUXT LTD.
 
-(ns gas.web-server
+(ns atea.web-server
   (:require
    [bidi.bidi :refer [tag]]
    [bidi.vhosts :refer [make-handler vhosts-model]]
    [clojure.tools.logging :refer :all]
    [com.stuartsierra.component :refer [Lifecycle using]]
    [clojure.java.io :as io]
-   [gas.wallboard :as wallboard]
    [schema.core :as s]
-   [selmer.parser :as selmer]
+  ;; [selmer.parser :as selmer]
    [yada.resources.webjar-resource :refer [new-webjar-resource]]
    [yada.yada :refer [resource] :as yada]
    [yada.handler :as handler]
@@ -55,4 +54,4 @@
 (defn new-web-server []
   (using
    (map->WebServer {})
-   [:uccx-stats :hr-db :wall-db ]))
+   [:hr-db :wall-db ]))

@@ -1,5 +1,5 @@
 ;; Copyright © 2017, Red Elvis.
-(ns gas.system
+(ns atea.system
   (:require
    [aero.core :as aero]
    [clojure.java.io :as io]
@@ -29,10 +29,10 @@
   [config]
   (system-map
    :web-server (new-web-server)
-   :selmer (new-selmer)
-   :hr-db   (new-hrdb    (:uccx config))
-   :wall-db (new-walldb  (:uccx config))
-   :uccx-stats (new-localdb)
+ ;;  :selmer (new-selmer)
+ ;;  :hr-db   (new-hrdb    (:uccx config))
+ ;;  :wall-db (new-walldb  (:uccx config))
+ ;;  :uccx-stats (new-localdb)
    ))
 
 (defn new-dependency-map

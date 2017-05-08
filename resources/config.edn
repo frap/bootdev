@@ -3,8 +3,8 @@
 ;; Aero configuration for DB access
 
 {
- :port #or [#env UCCX_PORT 1504]
- :uccx_srv #or [#env UCCX_SRV "devuccx10"]
+  :port #or [#env UCCX_PORT 1504]
+  :uccx_srv #or [#env UCCX_SRV "devuccx10"]
   :uccx_ip #or [#env UCCX_IP "9.1.1.103"]
   :uccx_sec_srv #or [#env UCCX_SEC_SRV "9.1.1.64"]
   :uccx_sec_ip #or [#env UCCX_SEC_IP "9.1.1.64"]
