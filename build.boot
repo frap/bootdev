@@ -15,6 +15,7 @@
         (str a (inc (Long/parseLong b))))))
   )
 
+
 (defn deduce-version-from-git
   "Avoid another decade of pointless, unnecessary and error-prone
   fiddling with version labels in source code."
@@ -25,10 +26,10 @@
     (cond
       dirty? (str (next-version version) "-" hash "-dirty")
       (pos? (Long/parseLong commits)) (str (next-version version) "-" hash)
-      :otherwise version)))
+      :otherwise (str version))))
 
 (def project "gas-sample")
-(def version "0.0.2" ;;(deduce-version-from-git)
+(def version (deduce-version-from-git)
   )
 
 (set-env!
@@ -40,7 +41,7 @@
  :dependencies
  '[  [org.clojure/clojure "1.8.0"]         ;; add CLJ
      ;;[org.clojure/core.incubator "0.1.4"]
-     [org.clojure/clojurescript "1.9.473"] ;; add CLJS
+     [org.clojure/clojurescript "1.9.521"] ;; add CLJS
 
      [adzerk/boot-cljs "2.0.0"      :scope "test"]
      [pandeiro/boot-http "0.8.0"        :scope "test"]
@@ -48,7 +49,7 @@
      [adzerk/boot-cljs-repl "0.3.3"     :scope "test"]    ;; add bREPL
      [com.cemerick/piggieback "0.2.1"   :scope "test"]    ;; needed by bREPL
      [weasel "0.7.0"                    :scope "test"]    ;; websocket srv
-     [org.clojure/tools.nrepl "0.2.12"  :scope "test"]    ;; needed by bREPL
+     [org.clojure/tools.nrepl "0.2.13"  :scope "test"]    ;; needed by bREPL
      [reloaded.repl "0.2.3"             :scope "test"]
      [boot-deps "0.1.6"                 :scope "test"]    ;;  ancient for boot 
    
@@ -104,31 +105,14 @@
          '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
          '[atea.system :refer [new-system]]
-         '[org.clojure/tools.logging "0.3.1"]
-         '[adzerk/boot-logservice "1.2.0"]
+  ;;       '[org.clojure/tools.logging "0.3.1"]
+  ;;       '[adzerk/boot-logservice "1.2.0"]
          )
 
 
-(def log-config
-  [:configuration {:scan true, :scanPeriod "10 seconds"}
-   [:appender {:name "FILE" :class "ch.qos.logback.core.rolling.RollingFileAppender"}
-    [:encoder [:pattern "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"]]
-    [:rollingPolicy {:class "ch.qos.logback.core.rolling.TimeBasedRollingPolicy"}
-     [:fileNamePattern "logs/%d{yyyy-MM-dd}.%i.log"]
-     [:timeBasedFileNamingAndTriggeringPolicy {:class "ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"}
-      [:maxFileSize "64 MB"]]]
-    [:prudent true]]
-   [:appender {:name "STDOUT" :class "ch.qos.logback.core.ConsoleAppender"}
-    [:encoder [:pattern "%-5level %logger{36} - %msg%n"]]
-    [:filter {:class "ch.qos.logback.classic.filter.ThresholdFilter"}
-     [:level "INFO"]]]
-   [:root {:level "INFO"}
-    [:appender-ref {:ref "FILE"}]
-    [:appender-ref {:ref "STDOUT"}]]
-   [:logger {:name "user" :level "ALL"}]
-   [:logger {:name "boot.user" :level "ALL"}]])
 
-(alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
+
+;;(alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
 
 (def repl-port 5600)
 
@@ -143,7 +127,7 @@
                :output-to "main.js"
                :testbed :phantom
                :namespaces '#{atea.validators-test
-                              atea.login.validators-test}})
+                              }})
 
 (deftask add-source-paths
   "Add paths to :source-paths environment variable"
@@ -203,7 +187,7 @@
         testbed (or testbed (:testbed defaults))
         namespaces (or namespaces (:namespaces defaults))]
     (comp
-     (serve :handler 'atea.core/app
+     (serve :handler 'atea.system/new-system 
             :resource-root "target"
             :reload true
             :httpkit httpkit

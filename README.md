@@ -1,2 +1,5 @@
-# boot-uccx
-Playaround with UCCX stats access for wallboard
+# bootdev
+
+Default project setup for boot and clojure for atea development
+
+

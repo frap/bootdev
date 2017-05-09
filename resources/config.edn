@@ -14,7 +14,7 @@
   :hruser    "uccxhruser"
   :walluser  "uccxwallboard"
 
-:uccx
+:db
  {
   :hruri    #join [ "jdbc:informix-sqli://"
                    ^:ref [:uccx_ip]
