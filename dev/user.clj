@@ -23,8 +23,8 @@
    ;;[schema.core :as s]
    ;;[yada.test :refer [response-for]]
    ;;logging
-  ;; [adzerk/boot-logservice :as log-service]
-   [clojure.tools.logging  :as log]
+   ;;[adzerk/boot-logservice :as log-service]
+   ;;[clojure.tools.logging  :as log]
    ;; Exceptions
    [dire.core :refer [with-handler! with-finally!]]
 
@@ -41,7 +41,6 @@
       (system/new-dependency-map))
      config)))
 
-(alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
 
 (reloaded.repl/set-init! new-dev-system)
 

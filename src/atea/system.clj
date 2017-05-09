@@ -4,9 +4,9 @@
    [aero.core :as aero]
    [clojure.java.io :as io]
    [com.stuartsierra.component :refer [system-map system-using]]
-   [gas.selmer :refer [new-selmer]]
-   [gas.web-server :refer [new-web-server]]
-   [gas.db :refer  [new-hrdb new-walldb new-localdb]]
+   ;;[atea.selmer :refer [new-selmer]]
+   [atea.web-server :refer [new-web-server]]
+   ;; [atea.db :refer  [new-hrdb new-walldb new-localdb]]
    )
 )
 

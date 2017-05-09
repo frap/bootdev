@@ -28,7 +28,8 @@
       :otherwise version)))
 
 (def project "gas-sample")
-(def version (deduce-version-from-git))
+(def version "0.0.2" ;;(deduce-version-from-git)
+  )
 
 (set-env!
  :source-paths    #{"src"}
@@ -37,22 +38,12 @@
                     }
  :repositories #(conj % '["ibm" {:url "https://mvnrepository.com/artifact/com.ibm.informix/jdbc"}])
  :dependencies
- '[
-                 [org.clojars.magomimmo/domina "2.0.0-SNAPSHOT"]
-                 [hiccups "0.3.0"]
-                 [compojure "1.5.2"]                   ;; for routing
-                 [org.clojars.magomimmo/shoreleave-remote-ring "0.3.3"]
-                 [org.clojars.magomimmo/shoreleave-remote "0.3.1"]
-                 [javax.servlet/javax.servlet-api "3.1.0"]
-                 [org.clojars.magomimmo/valip "0.4.0-SNAPSHOT"]
-                 [enlive "1.1.6"]
-   ][
-     [org.clojure/clojure "1.8.0"]         ;; add CLJ
+ '[  [org.clojure/clojure "1.8.0"]         ;; add CLJ
      ;;[org.clojure/core.incubator "0.1.4"]
      [org.clojure/clojurescript "1.9.473"] ;; add CLJS
 
-     [adzerk/boot-cljs "1.7.228-2"      :scope "test"]
-     [pandeiro/boot-http "0.7.6"        :scope "test"]
+     [adzerk/boot-cljs "2.0.0"      :scope "test"]
+     [pandeiro/boot-http "0.8.0"        :scope "test"]
      [adzerk/boot-reload "0.5.1"        :scope "test"]
      [adzerk/boot-cljs-repl "0.3.3"     :scope "test"]    ;; add bREPL
      [com.cemerick/piggieback "0.2.1"   :scope "test"]    ;; needed by bREPL
@@ -69,23 +60,25 @@
       
      ;; Server deps
      [aero "1.1.2"]
-     [bidi "2.0.16"]
-     [aleph "0.4.3"]
+     [bidi "2.0.17"]
+     [aleph "0.4.4-alpha3"]
      [com.stuartsierra/component "0.3.2"]
      [org.clojure/tools.namespace "0.2.11"]
      ;;[hiccup "1.0.5"]
      
      ;;[selmer "1.10.6"]
-    ;;[yada "1.2.1" :exclusions [aleph manifold ring-swagger prismatic/schema]]
+     [yada "1.2.2" :exclusions [aleph manifold ring-swagger prismatic/schema]]
    
      [clj-time "0.13.0"]
 
      ;; DB dependencies
      ;;[com.layerware/hugsql "0.4.7"]
-     ;;[org.clojure/java.jdbc "0.7.0-alpha1"]
+     [org.clojure/java.jdbc "0.7.0-alpha3"  :scope "test"]
+     ;;[com.h2database  "1.4.195"             :scope "test"]
+     ;;[com.postgresql  "42.1.1"              :scope "test"]
      [atea/hikaricp-component "0.1.6"]
      [com.ibm.informix/jdbc "4.10.8.1"]
-     [org.clojars.pntblnk/clj-ldap "0.0.13"]  ;; LDAP
+     [org.clojars.pntblnk/clj-ldap "0.0.12" :scope "test"]  ;; LDAP
    
      ;;[datascript "0.15.5"]
 
@@ -111,7 +104,31 @@
          '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
          '[atea.system :refer [new-system]]
+         '[org.clojure/tools.logging "0.3.1"]
+         '[adzerk/boot-logservice "1.2.0"]
          )
+
+
+(def log-config
+  [:configuration {:scan true, :scanPeriod "10 seconds"}
+   [:appender {:name "FILE" :class "ch.qos.logback.core.rolling.RollingFileAppender"}
+    [:encoder [:pattern "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"]]
+    [:rollingPolicy {:class "ch.qos.logback.core.rolling.TimeBasedRollingPolicy"}
+     [:fileNamePattern "logs/%d{yyyy-MM-dd}.%i.log"]
+     [:timeBasedFileNamingAndTriggeringPolicy {:class "ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"}
+      [:maxFileSize "64 MB"]]]
+    [:prudent true]]
+   [:appender {:name "STDOUT" :class "ch.qos.logback.core.ConsoleAppender"}
+    [:encoder [:pattern "%-5level %logger{36} - %msg%n"]]
+    [:filter {:class "ch.qos.logback.classic.filter.ThresholdFilter"}
+     [:level "INFO"]]]
+   [:root {:level "INFO"}
+    [:appender-ref {:ref "FILE"}]
+    [:appender-ref {:ref "STDOUT"}]]
+   [:logger {:name "user" :level "ALL"}]
+   [:logger {:name "boot.user" :level "ALL"}]])
+
+(alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
 
 (def repl-port 5600)
 

@@ -7,33 +7,33 @@
    [clojure.tools.logging :refer :all]
    [com.stuartsierra.component :refer [Lifecycle using]]
    [clojure.java.io :as io]
-   [schema.core :as s]
+   ;;[schema.core :as s]
   ;; [selmer.parser :as selmer]
    [yada.resources.webjar-resource :refer [new-webjar-resource]]
    [yada.yada :refer [resource] :as yada]
    [yada.handler :as handler]
-   [clojure.walk :as walk]))
+   [clojure.walk :as walk]
+   )
+  )
 
 (defn routes
   "Create the URI route structure for our application."
   [config]
   [""
-   [["/" (yada/redirect ::wallboard/wallboard-index)]
+   [["/" (yada/redirect ::index)]
 
-    (wallboard/wallboard-routes)
-
-    ["/wallboard.css"
-     (-> (yada/as-resource (io/resource "public/wallboard.css"))
+    ["/sample.css"
+     (-> (yada/as-resource (io/resource "public/css/sample.css"))
          (assoc :id ::stylesheet))]
 
     ;; This is a backstop. Always produce a 404 if we ge there. This
     ;; ensures we never pass nil back to Aleph.
     [true (yada/handler nil)]]])
 
-(s/defrecord WebServer [host :- s/Str
-                        port :- s/Int
-                        db
-                        listener]
+(defrecord WebServer [host
+                      port
+                      db
+                      listener]
   Lifecycle
   (start [component]
     (if listener
@@ -54,4 +54,4 @@
 (defn new-web-server []
   (using
    (map->WebServer {})
-   [:hr-db :wall-db ]))
+   [:db ]))

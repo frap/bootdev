@@ -25,10 +25,10 @@
 
 
 (def wallb-dbspec { :classname "com.informix.jdbc.IfxDriver"
-                   :subprotocol "informix-sqli"
-                   :subname "//9.1.1.62:1504/db_cra:informixserver=atea_dev_uccx11_uccx"
-                  :user "uccxwallboard"
-                  :password "ateasystems0916"})
+                    :subprotocol "informix-sqli"
+                    :subname "//9.1.1.62:1504/db_cra:informixserver=atea_dev_uccx11_uccx"
+                    :user "uccxwallboard"
+                    :password "ateasystems0916"})
 
 
 (defn db-spec [subprotocol driver-classname subname user password]
