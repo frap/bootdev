@@ -3,6 +3,24 @@
 ;; Aero configuration for DB access
 
 {
+ :web-server
+ #profile {:dev {:host "localhost"
+                 :port 6666}
+           :prod {:host "docker.ateasystems.com"
+                  :port  6666}
+           }
+
+:selmer
+ {:template-caching?
+  #profile {:dev false
+            :test false
+            :pre-prod true
+            :prod true}
+  }
+
+
+:db
+ {
   :port #or [#env UCCX_PORT 1504]
   :uccx_srv #or [#env UCCX_SRV "devuccx10"]
   :uccx_ip #or [#env UCCX_IP "9.1.1.103"]
@@ -14,8 +32,6 @@
   :hruser    "uccxhruser"
   :walluser  "uccxwallboard"
 
-:db
- {
   :hruri    #join [ "jdbc:informix-sqli://"
                    ^:ref [:uccx_ip]
                    ":"

@@ -2,8 +2,23 @@
 (ns atea.db
   (:require   [com.stuartsierra.component :refer [Lifecycle]]
               [duct.component.hikaricp :refer [hikaricp]]
+              [clojure.spec.alpha :as s]
+              [clojure.future :refer :all]
+
               )
 )
+
+
+(def jdbc-regex #"jdbc:[a-zA-Z0-9._+-]+:[a-zA-Z0-9._/;=:]+")
+
+(s/def ::jdbc-type     (s/and string? #(re-matches jdbc-regex %)))
+(s/def ::stringornil   (s/nilable string?))
+(s/def ::jdbc-timeout  (s/nilable (s/and pos-int? #(> % 250))))
+(s/def ::posintornil   (s/nilable pos-int?))
+
+(defn create-db  [entries]
+  (assert entries)
+  {:db (atom entries)})
 
 (defn new-hrdb [config]
   (hikaricp    {:pool-name "UccxHR"
@@ -67,4 +82,3 @@
 
 (defn new-db [m]
   (map->Database m))
-

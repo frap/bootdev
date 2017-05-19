@@ -37,9 +37,11 @@
  :resource-paths  #{"resources"
                     "src" ;; add sources to uberjar
                     }
+ :asset-paths #{"assets"}
  :repositories #(conj % '["ibm" {:url "https://mvnrepository.com/artifact/com.ibm.informix/jdbc"}])
  :dependencies
- '[  [org.clojure/clojure "1.8.0"]         ;; add CLJ
+ '[  [org.clojure/clojure "1.8.0" :scope "provided"]         ;; add CLJ
+     [clojure-future-spec "1.9.0-alpha16-1"]
      ;;[org.clojure/core.incubator "0.1.4"]
      [org.clojure/clojurescript "1.9.521"] ;; add CLJS
 
@@ -51,25 +53,25 @@
      [weasel "0.7.0"                    :scope "test"]    ;; websocket srv
      [org.clojure/tools.nrepl "0.2.13"  :scope "test"]    ;; needed by bREPL
      [reloaded.repl "0.2.3"             :scope "test"]
-     [boot-deps "0.1.6"                 :scope "test"]    ;;  ancient for boot 
-   
-     ;;[deraen/boot-sass "0.3.0" :scope "test"]
+     [boot-deps "0.1.6"                 :scope "test"]    ;;  ancient for boot
+
+     ;;[deraen/boot-sass "0.3.1" :scope "test"]
      ;;TESTing
      [adzerk/boot-test "1.2.0"          :scope "test"]
-     [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT" :scope "test"]
+     [crisptrutski/boot-cljs-test "0.3.1-SNAPSHOT" :scope "test"]
 
-      
+
      ;; Server deps
      [aero "1.1.2"]
      [bidi "2.0.17"]
      [aleph "0.4.4-alpha3"]
      [com.stuartsierra/component "0.3.2"]
      [org.clojure/tools.namespace "0.2.11"]
-     ;;[hiccup "1.0.5"]
-     
-     ;;[selmer "1.10.6"]
+     [hiccup "1.0.5"]
+     [prismatic/schema "1.1.4"]
+     [selmer "1.10.7"]
      [yada "1.2.2" :exclusions [aleph manifold ring-swagger prismatic/schema]]
-   
+
      [clj-time "0.13.0"]
 
      ;; DB dependencies
@@ -80,7 +82,7 @@
      [atea/hikaricp-component "0.1.6"]
      [com.ibm.informix/jdbc "4.10.8.1"]
      [org.clojars.pntblnk/clj-ldap "0.0.12" :scope "test"]  ;; LDAP
-   
+
      ;;[datascript "0.15.5"]
 
      ;;logging
@@ -88,7 +90,7 @@
      [adzerk/boot-logservice "1.2.0"]
 
      ;; App deps
-     ;;[reagent "0.6.0"]
+     [reagent "0.6.1"]
 
      ;; Exceptions
      [dire "0.5.4"]
@@ -105,29 +107,38 @@
          '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
          '[atea.system :refer [new-system]]
-  ;;       '[org.clojure/tools.logging "0.3.1"]
-  ;;       '[adzerk/boot-logservice "1.2.0"]
-         )
-
-
-
+          )
 
 ;;(alter-var-root #'log/*logger-factory* (constantly (log-service/make-factory log-config)))
 
 (def repl-port 5600)
 
 (task-options!
- pom {:project (symbol project)
-      :version version
-      :description "A sample boot project setup"
-      :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}}
+ push {:ensure-branch nil}
+ pom  {:project (symbol project)
+       :version version
+       :description "A sample boot project setup"
+       :url "http://github.com/frap/bootdev"
+       :scm {:url "http://github.com/frap/bootdev"}
+       :license {"The MIT License (MIT)" "http://opensource.org/licenses/mit-license.php"}
+       }
+ test {:namespaces #{'atea.time-test }}
+ test-cljs {:namespaces #{'atea.core }}
 )
 
-(def defaults {:test-dirs #{"test/cljc"}
-               :output-to "main.js"
+(def defaults {:test-dirs #{"test/cljc" "test/clj"}
+               :output-to ["js/main"]
                :testbed :phantom
-               :namespaces '#{atea.validators-test
-                              }})
+               :namespaces '#{atea.time-test
+                              }
+               })
+
+
+(deftask testing
+  []
+  (merge-env! :source-paths #{"test/cljc" "test/clj"})
+  identity)
+
 
 (deftask add-source-paths
   "Add paths to :source-paths environment variable"
@@ -139,15 +150,15 @@
   "Develop the server backend. The system is automatically started in
   the dev profile."
   []
-  (require 'reloaded.repl)
-  (let [go (resolve 'reloaded.repl/go)]
-    (try
-      (require 'user)
-      (go)
-      (catch Exception e
-        (boot.util/fail "Exception while starting the system\n")
-        (boot.util/print-ex e))))
-  identity)
+  (with-pass-thru _
+    (require 'reloaded.repl)
+    (let [go (resolve 'reloaded.repl/go)]
+      (try
+        (require 'user)
+        (go)
+        (catch Exception e
+          (boot.util/fail "Exception while starting the system\n")
+          (boot.util/print-ex e))))))
 
 (deftask dev
   "This is the main development entry point."
@@ -178,7 +189,7 @@
    k httpkit               bool   "Use http-kit web server (default jetty)"
    n namespaces     NS     #{sym} "the set of namespace symbols to run tests in"
    o output-to      NAME   str    "the JS output file name for test (default main.js)"
-   O optimizations  LEVEL  kw     "the CLJS optimisation level (default none)"
+   O optimisations  LEVEL  kw     "the CLJS optimisation level (default none)"
    p port           PORT   int    "the web server port to listen on (default 3000)"
    t dirs           PATH   #{str} "test paths (default test/clj test/cljs test/cljc)"
    v verbose               bool   "Print which files have changed (default false)"]
@@ -187,22 +198,63 @@
         testbed (or testbed (:testbed defaults))
         namespaces (or namespaces (:namespaces defaults))]
     (comp
-     (serve :handler 'atea.system/new-system 
+     (serve :handler 'atea.system/new-system
             :resource-root "target"
             :reload true
             :httpkit httpkit
             :port port)
      (add-source-paths :dirs dirs)
      (watch :verbose verbose)
+     (speak)
      (reload :ws-host "localhost")
      (cljs-repl)
-     (test-cljs :out-file output-to
+     (test-cljs :ids output-to
                 :js-env testbed
                 :namespaces namespaces
                 :update-fs? true
-                :optimizations optimizations)
+                :optimizations optimisations)
      (test :namespaces namespaces)
      (target :dir #{"target"}))))
+
+(deftask clj-tdd
+  "Launch a clj TDD Environment"
+  []
+  (comp
+   (testing)
+   (watch)
+   (speak)
+   (test :namespaces #{'atea.lib-test}
+         )
+   )
+  )
+
+(deftask cljs-tdd
+  "Launch a cljs TDD Environment"
+  []
+  (comp
+   (testing)
+   (watch)
+   (speak)
+   (test-cljs :namespaces #{'atea.lib-test
+                            'atea.app-test}
+              :js-env :phantom)
+   )
+  )
+
+(deftask test-watch-karma []
+  (comp (testing)
+        (watch)
+        (speak)
+        (test-cljs :js-env :chrome)
+        (test)))
+
+(deftask test-all []
+  (comp (testing)
+        (test-cljs :keep-errors? true)
+        (test)
+        (report-errors!)))
+
+
 
 (defn- run-system [profile]
   (println "Running system with profile" profile)

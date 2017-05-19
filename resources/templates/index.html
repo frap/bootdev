@@ -1,0 +1,54 @@
+{% extends "_wrapper.html" %}
+
+{% block main %}
+
+<h1>Hola! Bienvendios a development de Atea</h1>
+
+<section>
+  <h1>Browser REPL</h1>
+
+  <p>You can upgrade the REPL to a browser REPL</p>
+
+  <pre><code>(cljs-repl)</code></pre>
+
+  <p>Get back to the server repl with `:cljs/quit`</p>
+
+  <p>Alternatively you can connect to the REPL over port 5600</p>
+
+</section>
+
+<section>
+  <h1>Configuration</h1>
+
+  <p>
+    Configuration can be found in {% source resources/config.edn
+    %}. This is a standard EDN file containing tag literals which help
+    configure the system for multiple operating
+    environments. <a href="https://github.com/juxt/aero">Aero</a> is
+    used for reading the configuration file.
+  </p>
+</section>
+
+<section>
+  <h1>Sass CSS</h1>
+
+  <p>
+    To change the style, edit the <tt>.scss</tt> files in
+    the <tt>sass</tt> directory. Changes will be compiled
+    automatically. If you are building a ClojureScript app, these
+    changes will be automatically reloaded into the browser for
+    immediate feedback.
+  </p>
+</section>
+
+<section>
+    <h1>Colophon</h1>
+
+  <p>
+    This page is made from a Selmer template stored in {% source
+    resources/templates/index.html %}.
+  </p>
+
+</section>
+
+{% endblock %}

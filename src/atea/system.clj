@@ -4,10 +4,9 @@
    [aero.core :as aero]
    [clojure.java.io :as io]
    [com.stuartsierra.component :refer [system-map system-using]]
-   ;;[atea.selmer :refer [new-selmer]]
-
+   [atea.selmer :refer [new-selmer]]
    [atea.web-server :refer [new-web-server]]
-   ;; [atea.db :refer  [new-hrdb new-walldb new-localdb]]
+   [atea.db :as db]
    )
 )
 
@@ -30,10 +29,8 @@
   [config]
   (system-map
    :web-server (new-web-server)
- ;;  :selmer (new-selmer)
- ;;  :hr-db   (new-hrdb    (:uccx config))
- ;;  :wall-db (new-walldb  (:uccx config))
- ;;  :uccx-stats (new-localdb)
+   :selmer (new-selmer)
+   :db (db/create-db (:db config))
    ))
 
 (defn new-dependency-map

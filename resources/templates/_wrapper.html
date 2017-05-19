@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="{{ description|default:\"Atea - web kick-start copied from JUXT Edge\" }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% url static %}app.css"/>
+  </head>
+
+  <body>
+    {% block body %}
+    <main>
+    {% block main %}
+    {% endblock %}
+
+    <hr/>
+    <p style="margin-top: 1em"><a href="{% url index %}">Home</a></p>
+    </main>
+
+    {% endblock %}
+
+    <footer>
+      <p>Edge. Copyright &copy; 2017, <a href="https://ateasystems.com">Atea Systems</a> LTD.</p>
+    </footer>
+
+    <script src="{% absurl static %}atea.js" type="text/javascript"></script>
+  </body>
+</html>
