@@ -55,10 +55,10 @@
     ;; ensures we never pass nil back to Aleph.
     [true (yada/handler nil)]]])
 
-(defrecord WebServer [host
-                      port
-                      db
-                      listener]
+(s/defrecord WebServer [host :- s/Str
+                        port :- s/Int
+                        db
+                        listener]
   Lifecycle
   (start [component]
     (if listener

@@ -11,8 +11,8 @@
     </filter>
   </appender>
 
-  <logger name="edge" level="DEBUG"/>
-  
+  <logger name="atea" level="DEBUG"/>
+
   <root level="INFO">
     <appender-ref ref="CONSOLE" />
   </root>

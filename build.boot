@@ -1,3 +1,4 @@
+;; Copied off of JUXT edge all rights to JUXT LTD
 ;; A complete development environment for websites in Clojure and
 ;; ClojureScript.
 
@@ -34,6 +35,7 @@
 
 (set-env!
  :source-paths    #{"src"}
+ :test-paths #{"test"}
  :resource-paths  #{"resources"
                     "src" ;; add sources to uberjar
                     }
@@ -63,7 +65,7 @@
 
      ;; Server deps
      [aero "1.1.2"]
-     [bidi "2.0.17"]
+     [bidi "2.1.1"]
      [aleph "0.4.4-alpha3"]
      [com.stuartsierra/component "0.3.2"]
      [org.clojure/tools.namespace "0.2.11"]
@@ -79,7 +81,7 @@
      [org.clojure/java.jdbc "0.7.0-alpha3"  :scope "test"]
      ;;[com.h2database  "1.4.195"             :scope "test"]
      ;;[com.postgresql  "42.1.1"              :scope "test"]
-     [atea/hikaricp-component "0.1.6"]
+     [atea/hikaricp-component "0.1.8"]
      [com.ibm.informix/jdbc "4.10.8.1"]
      [org.clojars.pntblnk/clj-ldap "0.0.12" :scope "test"]  ;; LDAP
 
@@ -87,7 +89,11 @@
 
      ;;logging
      [org.clojure/tools.logging "0.3.1"]
-     [adzerk/boot-logservice "1.2.0"]
+     [org.slf4j/jcl-over-slf4j "1.7.21"]
+     [org.slf4j/jul-to-slf4j "1.7.21"]
+     [org.slf4j/log4j-over-slf4j "1.7.21"]
+     [ch.qos.logback/logback-classic "1.1.5" :exclusions [org.slf4j/slf4j-api]]
+
 
      ;; App deps
      [reagent "0.6.1"]
@@ -95,15 +101,15 @@
      ;; Exceptions
      [dire "0.5.4"]
      [slingshot "0.12.2"]
-     ]
+   ]
  )
 
 (require '[adzerk.boot-cljs :refer [cljs]]
-         '[pandeiro.boot-http :refer [serve]]
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[adzerk.boot-test :refer [test]]
-         '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+         '[pandeiro.boot-http :refer [serve]]
+         '[crisptrutski.boot-cljs-test :refer [test-cljs report-errors!]]
          '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
          '[atea.system :refer [new-system]]
@@ -150,15 +156,18 @@
   "Develop the server backend. The system is automatically started in
   the dev profile."
   []
-  (with-pass-thru _
-    (require 'reloaded.repl)
-    (let [go (resolve 'reloaded.repl/go)]
-      (try
-        (require 'user)
-        (go)
-        (catch Exception e
-          (boot.util/fail "Exception while starting the system\n")
-          (boot.util/print-ex e))))))
+  (let [run? (atom false)]
+    (with-pass-thru _
+      (when-not @run?
+        (reset! run? true)
+        (require 'reloaded.repl)
+        (let [go (resolve 'reloaded.repl/go)]
+          (try
+            (require 'user)
+            (go)
+            (catch Exception e
+              (boot.util/fail "Exception while starting the system\n")
+              (boot.util/print-ex (.getCause e)))))))))
 
 (deftask dev
   "This is the main development entry point."
@@ -171,6 +180,7 @@
 
   (comp
    (watch)
+   (speak)
    (cider)
    (repl :server true
          :port repl-port
@@ -254,14 +264,13 @@
         (test)
         (report-errors!)))
 
-
-
-(defn- run-system [profile]
-  (println "Running system with profile" profile)
-  (let [system (new-system profile)]
-    (component/start system)
-    (intern 'user 'system system)
-    (with-pre-wrap fileset
+(deftask run-system
+  [p profile VAL str "Profile to start system with"]
+  (with-post-wrap fileset
+    (println "Running system with profile" profile)
+    (let [system (new-system profile)]
+      (component/start system)
+      (intern 'user 'system system)
       (assoc fileset :system system))))
 
 (deftask run [p profile VAL kw "Profile"]
