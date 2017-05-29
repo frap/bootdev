@@ -16,7 +16,6 @@
         (str a (inc (Long/parseLong b))))))
   )
 
-
 (defn deduce-version-from-git
   "Avoid another decade of pointless, unnecessary and error-prone
   fiddling with version labels in source code."
@@ -47,19 +46,19 @@
      ;;[org.clojure/core.incubator "0.1.4"]
      [org.clojure/clojurescript "1.9.521"] ;; add CLJS
 
-     [adzerk/boot-cljs "2.0.0"      :scope "test"]
-     [pandeiro/boot-http "0.8.0"        :scope "test"]
-     [adzerk/boot-reload "0.5.1"        :scope "test"]
-     [adzerk/boot-cljs-repl "0.3.3"     :scope "test"]    ;; add bREPL
-     [com.cemerick/piggieback "0.2.1"   :scope "test"]    ;; needed by bREPL
-     [weasel "0.7.0"                    :scope "test"]    ;; websocket srv
-     [org.clojure/tools.nrepl "0.2.13"  :scope "test"]    ;; needed by bREPL
-     [reloaded.repl "0.2.3"             :scope "test"]
-     [boot-deps "0.1.6"                 :scope "test"]    ;;  ancient for boot
+     [adzerk/boot-cljs "2.0.0"                    :scope "test"]
+     [pandeiro/boot-http "0.8.0"                  :scope "test"]
+     [adzerk/boot-reload "0.5.1"                  :scope "test"]
+     [adzerk/boot-cljs-repl "0.3.3"               :scope "test"]    ;; add bREPL
+     [com.cemerick/piggieback "0.2.1"             :scope "test"]    ;; needed by bREPL
+     [weasel "0.7.0"                              :scope "test"]    ;; websocket srv
+     [org.clojure/tools.nrepl "0.2.13"            :scope "test"]    ;; needed by bREPL
+     [reloaded.repl "0.2.3"                       :scope "test"]
+     [boot-deps "0.1.6"                           :scope "test"]    ;;  ancient for boot
 
-     ;;[deraen/boot-sass "0.3.1" :scope "test"]
+     ;;[deraen/boot-sass "0.3.1"                  :scope "test"]
      ;;TESTing
-     [adzerk/boot-test "1.2.0"          :scope "test"]
+     [adzerk/boot-test "1.2.0"                     :scope "test"]
      [crisptrutski/boot-cljs-test "0.3.1-SNAPSHOT" :scope "test"]
 
 
@@ -78,9 +77,9 @@
 
      ;; DB dependencies
      ;;[com.layerware/hugsql "0.4.7"]
-     [org.clojure/java.jdbc "0.7.0-alpha3"  :scope "test"]
-     ;;[com.h2database  "1.4.195"             :scope "test"]
-     ;;[com.postgresql  "42.1.1"              :scope "test"]
+     [org.clojure/java.jdbc "0.7.0-alpha3"         :scope "test"]
+     ;;[com.h2database  "1.4.195"                  :scope "test"]
+     ;;[com.postgresql  "42.1.1"                   :scope "test"]
      [atea/hikaricp-component "0.1.8"]
      [com.ibm.informix/jdbc "4.10.8.1"]
      [org.clojars.pntblnk/clj-ldap "0.0.12" :scope "test"]  ;; LDAP
