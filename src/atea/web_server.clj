@@ -7,6 +7,7 @@
    [clojure.tools.logging :refer :all]
    [com.stuartsierra.component :refer [Lifecycle using]]
    [clojure.java.io :as io]
+   [hiccup.core :refer [html]]
    [schema.core :as s]
    [selmer.parser :as selmer]
    [yada.resources.webjar-resource :refer [new-webjar-resource]]
@@ -26,6 +27,7 @@
          :response (fn [ctx]
                      (selmer/render-file "index.html" {:title "Atea Index"
                                                        :ctx ctx}))}}})]
+
 
     ["" (assoc (yada/redirect :atea.resources/index) :id :atea.resources/content)]
 
@@ -47,6 +49,31 @@
     ["/css/atea.css"
      (-> (yada/as-resource (io/resource "public/css/atea.css"))
          (assoc :id ::stylesheet))]
+
+    ["/status" (yada/resource
+                {:methods
+                 {:get
+                  {:produces "text/html"
+                   :response (fn [ctx]
+                               (html
+                                [:body
+                                 [:div
+                                  [:h2 "System properties"]
+                                  [:table
+                                   (for [[k v] (sort (into {} (System/getProperties)))]
+                                     [:tr
+                                      [:td [:pre k]]
+                                      [:td [:pre v]]]
+                                     )]]
+                                 [:div
+                                  [:h2 "Environment variables"]
+                                  [:table
+                                   (for [[k v] (sort (into {} (System/getenv)))]
+                                     [:tr
+                                      [:td [:pre k]]
+                                      [:td [:pre v]]]
+                                     )]]
+                                 ]))}}})]
 
     ;; Our content routes, and potentially other routes.
     (content-routes)
