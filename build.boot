@@ -79,7 +79,7 @@
      [org.clojure/java.jdbc "0.7.0-alpha3"  :scope "test"]
      ;;[com.h2database  "1.4.195"             :scope "test"]
      ;;[com.postgresql  "42.1.1"              :scope "test"]
-     [atea/hikaricp-component "0.1.6"]
+     [atea/hikaricp-component "0.1.8"]
      [com.ibm.informix/jdbc "4.10.8.1"]
      [org.clojars.pntblnk/clj-ldap "0.0.12" :scope "test"]  ;; LDAP
 
@@ -103,7 +103,7 @@
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[adzerk.boot-test :refer [test]]
-         '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+         '[crisptrutski.boot-cljs-test :refer [test-cljs report-errors!]]
          '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
          '[atea.system :refer [new-system]]
@@ -171,6 +171,7 @@
 
   (comp
    (watch)
+   (speak)
    (cider)
    (repl :server true
          :port repl-port

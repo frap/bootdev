@@ -18,47 +18,22 @@
             :prod true}
   }
 
+ :uccx {
+        :port #or [#env UCCX_PORT 1504]
+        :uccx_srv #or [#env UCCX_SRV "devuccx10"]
+        :uccx_ip #or [#env UCCX_IP "9.1.1.103"]
+        :uccx_sec_srv #or [#env UCCX_SEC_SRV "9.1.1.64"]
+        :uccx_sec_ip #or [#env UCCX_SEC_IP "9.1.1.64"]
+        :uccx_db  #or [#env UCCX_DB "db_cra"]
+        :hrpasswd #or [#env HR_PASS "Cisco12345"]
+        :wallpasswd #or [#env WALL_PASS "Cisco12345"]
+        :hruser    "uccxhruser"
+        :walluser  "uccxwallboard"
+        }
 
 :db
  {
-  :port #or [#env UCCX_PORT 1504]
-  :uccx_srv #or [#env UCCX_SRV "devuccx10"]
-  :uccx_ip #or [#env UCCX_IP "9.1.1.103"]
-  :uccx_sec_srv #or [#env UCCX_SEC_SRV "9.1.1.64"]
-  :uccx_sec_ip #or [#env UCCX_SEC_IP "9.1.1.64"]
-  :uccx_db  #or [#env UCCX_DB "db_cra"]
-  :hrpasswd #or [#env HR_PASS "Cisco12345"]
-  :wallpasswd #or [#env WALL_PASS "Cisco12345"]
-  :hruser    "uccxhruser"
-  :walluser  "uccxwallboard"
-
-  :hruri    #join [ "jdbc:informix-sqli://"
-                   ^:ref [:uccx_ip]
-                   ":"
-                   ^:ref [:port]
-                   "/"
-                   ^:ref [:uccx_db]
-                   ":informixserver="
-                   ^:ref [:uccx_srv]
-                   "_uccx;user="
-                   ^:ref [:hruser]
-                   ";password="
-                   ^:ref [:hrpasswd]
-                   ]
-  :walluri  #join [ "jdbc:informix-sqli://"
-                   ^:ref [:uccx_ip]
-                   ":"
-                   ^:ref [:port]
-                   "/"
-                   ^:ref [:uccx_db]
-                   ":informixserver="
-                   ^:ref [:uccx_srv]
-                   "_uccx;user="
-                   ^:ref [:walluser]
-                   ";password="
-                   ^:ref [:wallpasswd]
-                   ]
-
-
-  }
- }
+#profile {:dev false
+          :prod false
+          }
+  }}

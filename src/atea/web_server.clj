@@ -7,6 +7,7 @@
    [clojure.tools.logging :refer :all]
    [com.stuartsierra.component :refer [Lifecycle using]]
    [clojure.java.io :as io]
+   [hiccup.core :refer [html]]
    [schema.core :as s]
    [selmer.parser :as selmer]
    [yada.resources.webjar-resource :refer [new-webjar-resource]]
@@ -55,10 +56,10 @@
     ;; ensures we never pass nil back to Aleph.
     [true (yada/handler nil)]]])
 
-(defrecord WebServer [host
-                      port
-                      db
-                      listener]
+(s/defrecord WebServer [host :- s/Str
+                        port :- s/Str
+                        db
+                        listener]
   Lifecycle
   (start [component]
     (if listener
