@@ -28,6 +28,7 @@
                      (selmer/render-file "index.html" {:title "Atea Index"
                                                        :ctx ctx}))}}})]
 
+
     ["" (assoc (yada/redirect :atea.resources/index) :id :atea.resources/content)]
 
     ;; Add some pairs (as vectors) here. First item is the path, second is the handler.
@@ -49,6 +50,31 @@
      (-> (yada/as-resource (io/resource "public/css/atea.css"))
          (assoc :id ::stylesheet))]
 
+    ["/status" (yada/resource
+                {:methods
+                 {:get
+                  {:produces "text/html"
+                   :response (fn [ctx]
+                               (html
+                                [:body
+                                 [:div
+                                  [:h2 "System properties"]
+                                  [:table
+                                   (for [[k v] (sort (into {} (System/getProperties)))]
+                                     [:tr
+                                      [:td [:pre k]]
+                                      [:td [:pre v]]]
+                                     )]]
+                                 [:div
+                                  [:h2 "Environment variables"]
+                                  [:table
+                                   (for [[k v] (sort (into {} (System/getenv)))]
+                                     [:tr
+                                      [:td [:pre k]]
+                                      [:td [:pre v]]]
+                                     )]]
+                                 ]))}}})]
+
     ;; Our content routes, and potentially other routes.
     (content-routes)
 
@@ -58,6 +84,7 @@
 
 (s/defrecord WebServer [host :- s/Str
                         port :- s/Str
+
                         db
                         listener]
   Lifecycle

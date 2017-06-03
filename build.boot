@@ -1,3 +1,4 @@
+;; Copied off of JUXT edge all rights to JUXT LTD
 ;; A complete development environment for websites in Clojure and
 ;; ClojureScript.
 
@@ -14,7 +15,6 @@
       (when (and a b)
         (str a (inc (Long/parseLong b))))))
   )
-
 
 (defn deduce-version-from-git
   "Avoid another decade of pointless, unnecessary and error-prone
@@ -34,6 +34,7 @@
 
 (set-env!
  :source-paths    #{"src"}
+ :test-paths #{"test"}
  :resource-paths  #{"resources"
                     "src" ;; add sources to uberjar
                     }
@@ -45,25 +46,25 @@
      ;;[org.clojure/core.incubator "0.1.4"]
      [org.clojure/clojurescript "1.9.521"] ;; add CLJS
 
-     [adzerk/boot-cljs "2.0.0"      :scope "test"]
-     [pandeiro/boot-http "0.8.0"        :scope "test"]
-     [adzerk/boot-reload "0.5.1"        :scope "test"]
-     [adzerk/boot-cljs-repl "0.3.3"     :scope "test"]    ;; add bREPL
-     [com.cemerick/piggieback "0.2.1"   :scope "test"]    ;; needed by bREPL
-     [weasel "0.7.0"                    :scope "test"]    ;; websocket srv
-     [org.clojure/tools.nrepl "0.2.13"  :scope "test"]    ;; needed by bREPL
-     [reloaded.repl "0.2.3"             :scope "test"]
-     [boot-deps "0.1.6"                 :scope "test"]    ;;  ancient for boot
+     [adzerk/boot-cljs "2.0.0"                    :scope "test"]
+     [pandeiro/boot-http "0.8.0"                  :scope "test"]
+     [adzerk/boot-reload "0.5.1"                  :scope "test"]
+     [adzerk/boot-cljs-repl "0.3.3"               :scope "test"]    ;; add bREPL
+     [com.cemerick/piggieback "0.2.1"             :scope "test"]    ;; needed by bREPL
+     [weasel "0.7.0"                              :scope "test"]    ;; websocket srv
+     [org.clojure/tools.nrepl "0.2.13"            :scope "test"]    ;; needed by bREPL
+     [reloaded.repl "0.2.3"                       :scope "test"]
+     [boot-deps "0.1.6"                           :scope "test"]    ;;  ancient for boot
 
-     ;;[deraen/boot-sass "0.3.1" :scope "test"]
+     ;;[deraen/boot-sass "0.3.1"                  :scope "test"]
      ;;TESTing
-     [adzerk/boot-test "1.2.0"          :scope "test"]
+     [adzerk/boot-test "1.2.0"                     :scope "test"]
      [crisptrutski/boot-cljs-test "0.3.1-SNAPSHOT" :scope "test"]
 
 
      ;; Server deps
      [aero "1.1.2"]
-     [bidi "2.0.17"]
+     [bidi "2.1.1"]
      [aleph "0.4.4-alpha3"]
      [com.stuartsierra/component "0.3.2"]
      [org.clojure/tools.namespace "0.2.11"]
@@ -76,9 +77,9 @@
 
      ;; DB dependencies
      ;;[com.layerware/hugsql "0.4.7"]
-     [org.clojure/java.jdbc "0.7.0-alpha3"  :scope "test"]
-     ;;[com.h2database  "1.4.195"             :scope "test"]
-     ;;[com.postgresql  "42.1.1"              :scope "test"]
+     [org.clojure/java.jdbc "0.7.0-alpha3"         :scope "test"]
+     ;;[com.h2database  "1.4.195"                  :scope "test"]
+     ;;[com.postgresql  "42.1.1"                   :scope "test"]
      [atea/hikaricp-component "0.1.8"]
      [com.ibm.informix/jdbc "4.10.8.1"]
      [org.clojars.pntblnk/clj-ldap "0.0.12" :scope "test"]  ;; LDAP
@@ -87,7 +88,11 @@
 
      ;;logging
      [org.clojure/tools.logging "0.3.1"]
-     [adzerk/boot-logservice "1.2.0"]
+     [org.slf4j/jcl-over-slf4j "1.7.21"]
+     [org.slf4j/jul-to-slf4j "1.7.21"]
+     [org.slf4j/log4j-over-slf4j "1.7.21"]
+     [ch.qos.logback/logback-classic "1.1.5" :exclusions [org.slf4j/slf4j-api]]
+
 
      ;; App deps
      [reagent "0.6.1"]
@@ -95,14 +100,14 @@
      ;; Exceptions
      [dire "0.5.4"]
      [slingshot "0.12.2"]
-     ]
+   ]
  )
 
 (require '[adzerk.boot-cljs :refer [cljs]]
-         '[pandeiro.boot-http :refer [serve]]
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[adzerk.boot-test :refer [test]]
+         '[pandeiro.boot-http :refer [serve]]
          '[crisptrutski.boot-cljs-test :refer [test-cljs report-errors!]]
          '[com.stuartsierra.component :as component]
          'clojure.tools.namespace.repl
@@ -150,15 +155,18 @@
   "Develop the server backend. The system is automatically started in
   the dev profile."
   []
-  (with-pass-thru _
-    (require 'reloaded.repl)
-    (let [go (resolve 'reloaded.repl/go)]
-      (try
-        (require 'user)
-        (go)
-        (catch Exception e
-          (boot.util/fail "Exception while starting the system\n")
-          (boot.util/print-ex e))))))
+  (let [run? (atom false)]
+    (with-pass-thru _
+      (when-not @run?
+        (reset! run? true)
+        (require 'reloaded.repl)
+        (let [go (resolve 'reloaded.repl/go)]
+          (try
+            (require 'user)
+            (go)
+            (catch Exception e
+              (boot.util/fail "Exception while starting the system\n")
+              (boot.util/print-ex (.getCause e)))))))))
 
 (deftask dev
   "This is the main development entry point."
@@ -255,14 +263,13 @@
         (test)
         (report-errors!)))
 
-
-
-(defn- run-system [profile]
-  (println "Running system with profile" profile)
-  (let [system (new-system profile)]
-    (component/start system)
-    (intern 'user 'system system)
-    (with-pre-wrap fileset
+(deftask run-system
+  [p profile VAL str "Profile to start system with"]
+  (with-post-wrap fileset
+    (println "Running system with profile" profile)
+    (let [system (new-system profile)]
+      (component/start system)
+      (intern 'user 'system system)
       (assoc fileset :system system))))
 
 (deftask run [p profile VAL kw "Profile"]

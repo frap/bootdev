@@ -13,41 +13,20 @@
    ;; [clojure.core.async :as a :refer [>! <! >!! <!! chan buffer dropping-buffer sliding-buffer close! timeout alts! alts!! go-loop]]
    [atea.system :as system]
    ;;[atea.sql :as sql]
-   
+
    [clojure.java.jdbc :as j]
-   [manifold.stream :as s]
+   [manifold.stream :as strm]
    [manifold.deferred :as d]
    [manifold.time :as t]
    [aleph.http :as http]
    ;; time
-   ;;[schema.core :as s]
-   ;;[yada.test :refer [response-for]]
-   ;;logging
-   ;;[adzerk/boot-logservice :as log-service]
-   ;;[clojure.tools.logging  :as log]
+   [schema.core :as s]
+   [yada.test :refer [response-for]]
    ;; Exceptions
    [dire.core :refer [with-handler! with-finally!]]
 
    ))
 
-(def log-config
-  [:configuration {:scan true, :scanPeriod "10 seconds"}
-   [:appender {:name "FILE" :class "ch.qos.logback.core.rolling.RollingFileAppender"}
-    [:encoder [:pattern "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"]]
-    [:rollingPolicy {:class "ch.qos.logback.core.rolling.TimeBasedRollingPolicy"}
-     [:fileNamePattern "logs/%d{yyyy-MM-dd}.%i.log"]
-     [:timeBasedFileNamingAndTriggeringPolicy {:class "ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"}
-      [:maxFileSize "64 MB"]]]
-    [:prudent true]]
-   [:appender {:name "STDOUT" :class "ch.qos.logback.core.ConsoleAppender"}
-    [:encoder [:pattern "%-5level %logger{36} - %msg%n"]]
-    [:filter {:class "ch.qos.logback.classic.filter.ThresholdFilter"}
-     [:level "INFO"]]]
-   [:root {:level "INFO"}
-    [:appender-ref {:ref "FILE"}]
-    [:appender-ref {:ref "STDOUT"}]]
-   [:logger {:name "user" :level "ALL"}]
-   [:logger {:name "boot.user" :level "ALL"}]])
 
 (defn new-dev-system
   "Create a development system"
@@ -59,8 +38,20 @@
       (system/new-dependency-map))
      config)))
 
-
 (reloaded.repl/set-init! new-dev-system)
+
+(defn check
+  "Check for component validation errors"
+  []
+  (let [errors
+        (->> system
+             (reduce-kv
+              (fn [acc k v]
+                (assoc acc k (s/check (type v) v)))
+              {})
+             (filter (comp some? second)))]
+
+    (when (seq errors) (into {} errors))))
 
 (defn get-latest-stats [] (-> pprint (:db system)))
 
